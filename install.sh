@@ -425,12 +425,20 @@ __update_feature_compatibility() {
 }
 
 __install_mongodb_ubuntu() {
-    if [[ "$_OS_CODENAME" == "bionic" || "$_OS_CODENAME" == "focal" || "$_OS_CODENAME" == "focal" ]]; then 
+    if [[ "$_OS_CODENAME" == "bionic" || "$_OS_CODENAME" == "focal" ]]; then 
         # MongoDB 4.2 is not available for Ubuntu 20, but the package from Ubuntu 18 works without conflicts
         __add_deb_repo "deb [ arch=$(dpkg --print-architecture) ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/$1 multiverse" \
             "mongodb-org-$1" \
             "https://www.mongodb.org/static/pgp/server-$1.asc"
-        __install_packages mongodb-org 
+        __install_packages mongodb-org
+    elif [[ "$_OS_CODENAME" == "jammy" ]]; then
+        # installation of 4.2 on 22.04 works but needs libssl1.1 which needs some extra hackiness
+        __add_deb_repo "deb http://security.ubuntu.com/ubuntu focal-security main"
+        __install_packages libssl1.1
+        __add_deb_repo "deb [ arch=$(dpkg --print-architecture) ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/$1 multiverse" \
+            "mongodb-org-$1" \
+            "https://www.mongodb.org/static/pgp/server-$1.asc"
+        __install_packages mongodb-org
     else 
         printf "\nUbuntu ${_OS_CODENAME} is unsupported by MongoDB $1 and cannot be installed.\n"
         __err $LINENO # Unsupported Ubuntu version 
