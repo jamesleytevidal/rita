@@ -35,7 +35,7 @@
     - name: "RITA Pre: Check CPU architecture"
       ansible.builtin.fail:
         msg: "CPU architecture {{ ansible_architecture }} is not supported."
-      when: ( ansible_architecture != "x86_64" ) #and ansible_architecture != "aarch64" ) # "aarch64" for pi. #pi0w is armv6l. i386. amd64?
+      when: ( ansible_architecture != "x86_64" and ansible_architecture != "aarch64" )
 
   tasks:
     # Add repositories
